@@ -24,7 +24,7 @@ scikit-learn==1.8.0
 statsmodels==0.14.6
 
 # ── Calidad & monitoreo de datos ─────────────────────────────
-great_expectations==1.17.0
+great_expectations==0.18.22
 evidently==0.7.21
 
 # ── MLOps ───────────────────────────────────────────────────

@@ -1,0 +1,46 @@
+# Credenciales y entorno
+.env
+.env.*
+!.env.example
+
+# Python
+smad-env/
+__pycache__/
+*.py[cod]
+*.pyo
+*.egg-info/
+dist/
+build/
+.eggs/
+
+# PostgreSQL portable
+postgresql-16/
+
+# IDEs
+.vscode/
+.idea/
+*.swp
+
+# MLflow / evidently
+mlruns/
+mlartifacts/
+
+# Datos sensibles
+*.key
+*.pem
+
+# Logs del servidor
+*.log
+mlops/uvicorn*.log
+mlops/api.log
+
+# Claude Code internal
+.claude/
+
+# Windows scripts (no relevantes en Linux/Render)
+mlops/start_api.bat
+
+# Pytest / coverage
+.pytest_cache/
+htmlcov/
+.coverage

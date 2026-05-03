@@ -1,0 +1,60 @@
+# ============================================================
+# Render Blueprint — SMAD Huawei
+# Despliega: API FastAPI (Python) + PostgreSQL Starter
+# Docs: https://render.com/docs/blueprint-spec
+# ============================================================
+
+services:
+  - type: web
+    name: smad-huawei-api
+    runtime: python
+    region: oregon          # us-west-2; cambiar a frankfurt para latencia menor en LATAM
+    plan: free              # cambiar a starter ($7/mes) para uptime 24/7 sin cold starts
+
+    # ── Build ──────────────────────────────────────────────
+    buildCommand: pip install -r requirements.txt
+
+    # ── Start: inicializa DB (idempotente) y arranca uvicorn
+    startCommand: >
+      python mlops/init_db.py &&
+      uvicorn mlops.main:app
+        --host 0.0.0.0
+        --port $PORT
+        --workers 2
+        --log-level info
+
+    # ── Variables de entorno ────────────────────────────────
+    envVars:
+      # URL de conexión inyectada automáticamente desde la DB de Render
+      - key: DATABASE_URL
+        fromDatabase:
+          name: smad-huawei-db
+          property: connectionString
+
+      # Encoding Unicode para NLG con emojis
+      - key: PYTHONUTF8
+        value: "1"
+      - key: PYTHONIOENCODING
+        value: utf-8
+
+      - key: ENVIRONMENT
+        value: production
+
+      # SECRET KEY — generar con: python -c "import secrets; print(secrets.token_hex(32))"
+      # Añadir en Render Dashboard > Environment > Add Secret File
+      - key: SECRET_KEY
+        generateValue: true
+
+    # ── Health check ────────────────────────────────────────
+    healthCheckPath: /health
+
+    # ── Auto-deploy al push a main ─────────────────────────
+    autoDeploy: true
+
+# ── Base de datos PostgreSQL ────────────────────────────────
+databases:
+  - name: smad-huawei-db
+    databaseName: huawei_smad
+    user: smad_admin
+    plan: free              # 90 días gratis; starter ($7/mes) para producción persistente
+    region: oregon

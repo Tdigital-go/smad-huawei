@@ -170,6 +170,26 @@ class HealthResponse(BaseModel):
 
 # ─── Endpoints ────────────────────────────────────────────────────────────────
 
+@app.get("/debug/db", tags=["Sistema"], include_in_schema=False)
+def debug_db():
+    """Diagnóstico de conexión DB — solo para troubleshooting, remover en producción."""
+    url_present = bool(_DATABASE_URL)
+    url_preview = (_DATABASE_URL[:30] + "...") if _DATABASE_URL else "NOT SET"
+    err = None
+    try:
+        db_query("SELECT 1")
+        connected = True
+    except Exception as exc:
+        connected = False
+        err = str(exc)
+    return {
+        "database_url_set": url_present,
+        "database_url_preview": url_preview,
+        "connected": connected,
+        "error": err,
+    }
+
+
 @app.get("/health", response_model=HealthResponse, tags=["Sistema"])
 def health():
     """Estado del sistema: conectividad DB y modelo ML."""

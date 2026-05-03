@@ -25,7 +25,14 @@ from dotenv import load_dotenv
 ROOT = Path(__file__).parent.parent
 load_dotenv(ROOT / ".env")
 
-_DATABASE_URL = os.getenv("DATABASE_URL")
+def _fix_url(url: str) -> str:
+    """Render entrega 'postgres://' pero psycopg2 requiere 'postgresql://'."""
+    if url and url.startswith("postgres://"):
+        return "postgresql://" + url[len("postgres://"):]
+    return url
+
+
+_DATABASE_URL = _fix_url(os.getenv("DATABASE_URL", ""))
 _DB_CONFIG = dict(
     host=os.getenv("DB_HOST", "127.0.0.1"),
     port=int(os.getenv("DB_PORT", 5432)),

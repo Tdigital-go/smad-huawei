@@ -36,8 +36,14 @@ from huawei_calculations import (            # noqa: E402
 # ─── Entorno ──────────────────────────────────────────────────────────────────
 load_dotenv(ROOT / ".env")
 
+# Render entrega 'postgres://' pero psycopg2 requiere 'postgresql://'
+def _fix_url(url: str) -> str:
+    if url and url.startswith("postgres://"):
+        return "postgresql://" + url[len("postgres://"):]
+    return url
+
 # Render inyecta DATABASE_URL completa; localmente usamos vars individuales
-_DATABASE_URL = os.getenv("DATABASE_URL")
+_DATABASE_URL = _fix_url(os.getenv("DATABASE_URL", ""))
 DB_CONFIG = dict(
     host=os.getenv("DB_HOST", "127.0.0.1"),
     port=int(os.getenv("DB_PORT", 5432)),

@@ -18,6 +18,7 @@ import psycopg2.extras
 from dotenv import load_dotenv
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import HTMLResponse
 from pydantic import BaseModel, Field
 
 # ─── Rutas del proyecto ───────────────────────────────────────────────────────
@@ -169,6 +170,15 @@ class HealthResponse(BaseModel):
 
 
 # ─── Endpoints ────────────────────────────────────────────────────────────────
+
+@app.get("/dashboard", tags=["Dashboard"], include_in_schema=False)
+def dashboard():
+    """Sirve el dashboard HTML autocontenido (Chart.js + 4 tabs)."""
+    path = ROOT / "dashboard" / "index.html"
+    if not path.exists():
+        raise HTTPException(status_code=404, detail="Dashboard no encontrado.")
+    return HTMLResponse(content=path.read_text(encoding="utf-8"))
+
 
 @app.get("/debug/db", tags=["Sistema"], include_in_schema=False)
 def debug_db():
